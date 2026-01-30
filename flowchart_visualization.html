@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice AI Agent - Master Process Flowchart</title>
+    <!-- Import Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .diagram-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .l-process {
+            background-color: #e1f5fe;
+            border: 2px solid #0277bd;
+        }
+
+        .l-decision {
+            background-color: #fff9c4;
+            border: 2px solid #fbc02d;
+            transform: rotate(45deg);
+            width: 10px;
+            height: 10px;
+            border-radius: 0;
+        }
+
+        .l-io {
+            background-color: #e8f5e9;
+            border: 2px solid #2e7d32;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Voice AI Agent - Master Process Logic</h1>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="dot l-process"></div> Process Step
+        </div>
+        <div class="legend-item">
+            <div class="dot l-decision"></div> Decision (Diamond)
+        </div>
+        <div class="legend-item">
+            <div class="dot l-io"></div> Input/Output
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    %% Node Styles
+    classDef terminal fill:#333,stroke:#333,color:white,stroke-width:2px,rx:10,ry:10;
+    classDef process fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,rx:5,ry:5;
+    classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,rhombus;
+    classDef io fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,rx:5,ry:5;
+    classDef error fill:#ffebee,stroke:#c62828,stroke-width:2px,rx:5,ry:5;
+
+    Start([Start]):::terminal
+    End([End]):::terminal
+
+    %% Frontend Group
+    subgraph Frontend [🟦 USER BROWSER]
+        direction TB
+        UserAction[User Clicks Record]:::io
+        RecStart[Start MediaRecorder]:::process
+        UserSpeak[/User Speaks.../]:::io
+        UserStop[User Clicks Stop]:::io
+        CreateBlob[Create Audio Blob]:::process
+        PrepareReq[Prepare FormData]:::process
+    end
+
+    %% Network
+    SendReq((POST Request)):::terminal
+
+    %% Backend Group
+    subgraph Backend [🟪 BACKEND SERVER]
+        direction TB
+        ReceiveReq[Receive Request]:::process
+        CheckFile{Has Audio File?}:::decision
+        
+        ReadAudio[Read Audio Data]:::process
+        
+        %% Deepgram
+        CallDG[Call Deepgram API]:::process
+        DGSuccess{Transcribed?}:::decision
+        ExtractText[Extract Transcript]:::process
+        
+        CheckText{Is Text Empty?}:::decision
+        SetDefault[Default: 'Sorry?']:::error
+        
+        %% AI
+        CallAI[Call GitHub Models]:::process
+        GenReply[Generate Agent Reply]:::process
+    end
+
+    %% Response
+    BuildJSON[Build JSON Response]:::process
+    SendResp((JSON Response)):::terminal
+    ReturnError1[Return 400 Error]:::error
+
+    %% Client Execution
+    subgraph ClientExec [🟦 BROWSER EXECUTION]
+        direction TB
+        ParseResp[Parse Response]:::process
+        UpdateUI[Update UI Text]:::process
+        HasReply{Has Agent Reply?}:::decision
+        CallTTS[Call speak]:::process
+        BrowserTTS[/🔊 Output Sound/]:::io
+    end
+
+    %% Connections
+    Start --> UserAction
+    UserAction --> RecStart
+    RecStart --> UserSpeak
+    UserSpeak --> UserStop
+    UserStop --> CreateBlob
+    CreateBlob --> PrepareReq
+    PrepareReq --> SendReq
+    
+    SendReq --> ReceiveReq
+    ReceiveReq --> CheckFile
+    
+    CheckFile -- Yes --> ReadAudio
+    CheckFile -- No --> ReturnError1
+    
+    ReadAudio --> CallDG
+    CallDG --> DGSuccess
+    
+    DGSuccess -- Success --> ExtractText
+    DGSuccess -- Fail --> SetDefault
+    
+    ExtractText --> CheckText
+    CheckText -- Valid --> CallAI
+    CheckText -- Empty --> SetDefault
+    
+    CallAI --> GenReply
+    GenReply --> BuildJSON
+    SetDefault --> BuildJSON
+    
+    BuildJSON --> SendResp
+    ReturnError1 --> SendResp
+    
+    SendResp --> ParseResp
+    ParseResp --> UpdateUI
+    UpdateUI --> HasReply
+    
+    HasReply -- Yes --> CallTTS
+    CallTTS --> BrowserTTS
+    BrowserTTS --> End
+    HasReply -- No --> End
+        </pre>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+
+</html>

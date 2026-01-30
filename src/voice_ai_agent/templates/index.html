@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice AI Agent | Premium Experience</title>
+    <!-- Favicon placeholder (Visual Excellence) -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3293/3293461.png">
+
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <!-- Abstract Background -->
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Application UI -->
+    <main class="app-container">
+        <header>
+            <h1>Voice<span>AI</span> Agent</h1>
+            <p class="subtitle">Next-Gen Intelligent Assistant</p>
+        </header>
+
+        <!-- Interaction Hub -->
+        <div class="glass visualizer-card">
+            <div class="visualizer-ring">
+                <div class="ring-bg"></div>
+                <button id="recordBtn" class="record-btn" title="Start Talking">
+                    <i data-lucide="mic" size="32"></i>
+                </button>
+            </div>
+
+            <div id="status" class="status-pill">Ready to listen</div>
+
+            <div style="width: 100%;">
+                <label class="label">Choose Intelligence</label>
+                <select id="modelSelect" class="model-picker">
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fastest)</option>
+                    <option value="gpt-4o">GPT-4o (Smartest)</option>
+                    <option value="gpt-4o-mini">GPT-4o Mini (Efficient)</option>
+                    <option value="DeepSeek-R1">DeepSeek R1 (Reasoning)</option>
+                    <option value="Meta-Llama-3.1-405B-Instruct">Llama 3.1 405B (Powerful)</option>
+                    <option value="Mistral-Nemo">Mistral Nemo (Fast)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Dialogue History -->
+        <div class="output-section">
+            <div class="msg-box user-msg">
+                <span class="label">You said</span>
+                <div id="userText">Your transcription will appear here...</div>
+            </div>
+
+            <div class="msg-box agent-msg">
+                <span class="label">Agent Reply</span>
+                <div id="agentText">Waiting for your command...</div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 2rem; text-align: center; font-size: 0.7rem; color: var(--text-dim); opacity: 0.5;">
+            &copy; 2026 Voice AI Agency | Deepgram & GitHub Models
+        </footer>
+    </main>
+
+    <!-- JS Logic -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
