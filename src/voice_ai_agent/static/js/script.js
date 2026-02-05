@@ -103,8 +103,24 @@ async function handleRecordingStop() {
         userTextEl.innerText = data.transcript || "(No clear audio)";
         agentTextEl.innerText = data.agent_reply || "(No response)";
 
-        // Text-to-Speech
-        if (data.agent_reply) {
+        // Text-to-Speech (Play AgentScope Audio or Fallback to Browser)
+        if (data.audio_base64) {
+            console.log("Playing AgentScope TTS...");
+            const audio = new Audio("data:audio/mp3;base64," + data.audio_base64);
+
+            audio.onplay = () => {
+                statusEl.innerText = "Agent is speaking...";
+            };
+            audio.onended = () => {
+                statusEl.innerText = "Ready";
+            };
+
+            audio.play().catch(e => {
+                console.error("Audio playback failed, falling back to browser TTS", e);
+                speak(data.agent_reply);
+            });
+        } else if (data.agent_reply) {
+            console.log("No audio returned, using Browser TTS fallback.");
             speak(data.agent_reply);
         }
 
